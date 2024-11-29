@@ -21,10 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang='en'>
       <body className={`${poppins.className} overflow-x-hidden overflow-y-auto relative h-screen w-screen`}>
-        {/* seo */}
-        <HeaderNav />
-        <div className='bg-slate-100/90 min-h-[90%]'>{children}</div>
-        <Footer />
+        {children}
       </body>
     </html>
   );

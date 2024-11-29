@@ -2,11 +2,22 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
+import { use, useEffect, useMemo, useState } from 'react';
 
-// import { scrollTo } from '@/utils/scrollTo';
-// import Image from 'next/image';
+type Props = {
+  isAuthed: boolean;
+};
 
-const HeaderNav = () => {
+const HeaderNav = ({ isAuthed }: Props) => {
+  const [userId, setUserId] = useState('');
+  useEffect(() => {
+    const id = localStorage.getItem('userId');
+
+    if (!id) return;
+
+    setUserId(id);
+  }, []);
+
   const handleMenuClick = (menuId: string) => {
     console.log('clicked!!:', menuId);
     // scrollTo(menuId);
@@ -42,21 +53,24 @@ const HeaderNav = () => {
         </span>
       </ul>
 
-      {/* auth  */}
-      <ul className='flex gap-x-4'>
-        <Link
-          href={'/?auth=login'}
-          className='text-emerald-500 tracking-wide text-sm font-medium shadow-sm shadow-slate-400/60 px-6 py-3 rounded-md '
-        >
-          Login
-        </Link>
-        <Link
-          href={'/?auth=start'}
-          className='text-slate-50 tracking-wide text-sm font-medium shadow-sm shadow-slate-400/50 bg-slate-800 px-7 py-3 rounded-md'
-        >
-          Start For Free
-        </Link>
-      </ul>
+      {!isAuthed ? (
+        <ul className='flex gap-x-4'>
+          <Link
+            href={'/auth'}
+            className='text-emerald-500 tracking-wide text-sm font-medium shadow-sm shadow-slate-400/60 px-6 py-3 rounded-md '
+          >
+            Login
+          </Link>
+          <Link
+            href={'/auth'}
+            className='text-slate-50 tracking-wide text-sm font-medium shadow-sm shadow-slate-400/50 bg-slate-800 px-7 py-3 rounded-md'
+          >
+            Start For Free
+          </Link>
+        </ul>
+      ) : (
+        <div className='text-slate-700'>Welcome, {userId}</div>
+      )}
     </div>
   );
 };
