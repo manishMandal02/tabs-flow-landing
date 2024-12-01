@@ -1,27 +1,32 @@
 'use client';
 
-import Image from 'next/image';
 import Link from 'next/link';
-import { use, useEffect, useMemo, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useState } from 'react';
+
+import { User } from '@/types/user';
 
 type Props = {
-  isAuthed: boolean;
+  isAuthed: boolean | undefined;
 };
 
 const HeaderNav = ({ isAuthed }: Props) => {
-  const [userId, setUserId] = useState('');
+  const [firstName, setFirstName] = useState('');
+
   useEffect(() => {
-    const id = localStorage.getItem('userId');
+    const user = localStorage.getItem('user');
 
-    if (!id) return;
-
-    setUserId(id);
-  }, []);
+    if (isAuthed && user) {
+      let parsedUser = JSON.parse(user) as User;
+      setFirstName(parsedUser.firstName);
+    }
+  }, [isAuthed]);
 
   const handleMenuClick = (menuId: string) => {
     console.log('clicked!!:', menuId);
     // scrollTo(menuId);
   };
+
   return (
     <div className='px-24  flex justify-between items-center border-b border-slate-200/60 sticky top-0 bg-slate-50 z-[60] h-[10%]'>
       {/* logo */}
@@ -53,23 +58,27 @@ const HeaderNav = ({ isAuthed }: Props) => {
         </span>
       </ul>
 
-      {!isAuthed ? (
+      {isAuthed === false ? (
         <ul className='flex gap-x-4'>
           <Link
-            href={'/auth'}
+            href={'/auth?type=login'}
             className='text-emerald-500 tracking-wide text-sm font-medium shadow-sm shadow-slate-400/60 px-6 py-3 rounded-md '
           >
             Login
           </Link>
           <Link
-            href={'/auth'}
+            href={'/auth?type=signup'}
             className='text-slate-50 tracking-wide text-sm font-medium shadow-sm shadow-slate-400/50 bg-slate-800 px-7 py-3 rounded-md'
           >
             Start For Free
           </Link>
         </ul>
+      ) : isAuthed === true ? (
+        <div className='text-slate-700'>
+          Welcome, <span className='font-medium'>{firstName}</span>
+        </div>
       ) : (
-        <div className='text-slate-700'>Welcome, {userId}</div>
+        <p className='text-slate-700'>Loading...</p>
       )}
     </div>
   );

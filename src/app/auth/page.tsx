@@ -1,70 +1,52 @@
 'use client';
 
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
-import { BsGoogle } from 'react-icons/bs';
+import React, { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-const apiBaseURL = 'https://api.dev.tabsflow.com';
+import { SignIn, SignUp } from '@/components/auth';
 
 const page = () => {
+  const [userId, setUserId] = useState('');
   const [email, setEmail] = useState('');
-  const [otp, setOTP] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
+  const [profilePic, setProfilePic] = useState('');
 
-  const [otpSent, setOTPSent] = useState(false);
+  const [shouldCreateProfile, setShouldCreateProfile] = useState(false);
+
+  const [error, setError] = useState('');
 
   const { push } = useRouter();
+  const query = useSearchParams();
+  const authType = query.get('type');
 
-  const handlerSendOTP = async () => {
-    console.log('sending otp...');
+  useEffect(() => {
+    let user = localStorage.getItem('user') as string;
+    user = JSON.parse(user);
+    const userId = localStorage.getItem('userId');
+    const userEmail = localStorage.getItem('userEmail');
 
-    const res = await fetch(`${apiBaseURL}/auth/send-otp`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email })
-    }).catch(err => console.log('sent otp err:', err.message));
-
-    if (!res?.ok) {
-      console.log('otp sent successfully.');
-
+    if (user) {
+      window.postMessage(user, '*');
+      push('/');
       return;
     }
 
-    setOTPSent(true);
-  };
-
-  const handleVerifyOTP = async () => {
-    const res = await fetch(`${apiBaseURL}/auth/verify-otp`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ email, otp })
-    }).catch(err => console.log('verify otp err:', err.message));
-
-    if (!res?.ok) {
-      console.log('verify otp err:', res);
-      return;
+    if (!user && userEmail && userId) {
+      setUserId(userId);
+      setEmail(userEmail);
+      setShouldCreateProfile(true);
     }
+  }, []);
 
-    const resData = await res.json();
+  const handleAuthSuccess = () => {
+    let user = localStorage.getItem('user') as string;
+    user = JSON.parse(user);
 
-    if (!resData.success) {
-      console.log('verify otp err:', resData?.message);
-      return;
-    }
+    window.postMessage(user, '*');
 
-    localStorage.setItem('userId', resData.data.userId);
-
-    console.log('is new user:', resData.data.isNewUser);
-
-    // setTimeout(() => {
-    //   push('/');
-    // }, 3000);
+    push('/');
   };
 
   return (
@@ -79,53 +61,39 @@ const page = () => {
 
       {/* right: auth form */}
       <div className='w-[40%] h-full flex items-center justify-start flex-col pt-24'>
-        <div className='w-[300px] flex items-center justify-center flex-col'>
-          <h1 className='text-lg text-slate-500/80 mb-16'>Start For Free</h1>
+        {false ? (
+          <div className='w-[300px] flex items-center justify-center flex-col'>
+            <h1 className='text-lg text-slate-500/80 mb-16'>
+              {authType === 'signup' ? 'Start For Free' : 'Welcome back!!'}
+            </h1>
 
-          <button className='w-full bg-slate-800 text-slate-100/90 font-light py-2 rounded-md flex items-center justify-center '>
-            <BsGoogle className='mr-2' /> Continue with Google
-          </button>
-
-          <span className='text-slate-500 opacity-40 scale-75 py-4'>–----------- OR -----------</span>
-          {!otpSent && (
-            <>
-              <input
-                type='text'
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                placeholder='Enter your email'
-                className='w-full border text-[14px] text-slate-800 border-slate-300/60 rounded-md py-2 px-3 outline-none mb-4'
+            {!shouldCreateProfile ? (
+              <SignIn
+                email={email}
+                onEmailChange={setEmail}
+                setError={setError}
+                setUserId={setUserId}
+                onAuthSuccess={handleAuthSuccess}
+                setShouldCreateProfile={setShouldCreateProfile}
               />
-
-              <button
-                disabled={!email}
-                onClick={handlerSendOTP}
-                className='w-full bg-slate-800 text-slate-100 font-light px-8 py-2 rounded-md flex items-center justify-center mt-4 disabled:cursor-not-allowed disabled:text-slate-300/90 disabled:bg-opacity-95'
-              >
-                Send OTP
-              </button>
-            </>
-          )}
-
-          {otpSent && (
-            <div className='w-full flex flex-col items-center'>
-              <input
-                value={otp}
-                onChange={e => setOTP(e.target.value)}
-                type='text'
-                placeholder='Enter OTP'
-                className='w-full border text-[14px] text-slate-800 border-slate-300/60 rounded-md py-2 px-3 outline-none mb-4'
+            ) : (
+              <SignUp
+                setError={setError}
+                setFirstName={setFirstName}
+                setLastName={setLastName}
+                onAuthSuccess={handleAuthSuccess}
+                user={{ id: userId, email, firstName, lastName, profilePic }}
               />
-              <button
-                disabled={!otp}
-                onClick={handleVerifyOTP}
-                className='w-full bg-slate-800 text-slate-100 font-light px-8 py-2 rounded-md flex items-center justify-center mt-4 disabled:cursor-not-allowed disabled:bg-slate-800 disabled:text-slate-300/80'
-              >
-                Verify OTP
-              </button>
-            </div>
-          )}
-        </div>
+            )}
+
+            {/* error */}
+            {error ? (
+              <div className='bg-rose-400 text-slate-700 px-4 py-2 rounded-sm text-[14px] mt-4'>{error}</div>
+            ) : null}
+          </div>
+        ) : (
+          <p className='text-slate-700 text-[16px] mt-12'>Loading...</p>
+        )}
       </div>
     </div>
   );
