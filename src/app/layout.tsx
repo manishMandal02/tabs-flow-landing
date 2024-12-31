@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Manage Tabs Like a Pro!!'
 };
 
-import type { ReactNode } from 'react';
+import { Suspense, type ReactNode } from 'react';
 import HeaderNav from '@/components/header-nav';
 import Footer from '@/components/footer';
 
@@ -21,7 +21,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
   return (
     <html lang='en'>
       <body className={`${poppins.className} overflow-x-hidden overflow-y-auto relative h-screen w-screen`}>
-        {children}
+        <Suspense fallback={<div>Loading...</div>}>{children}</Suspense>
       </body>
     </html>
   );

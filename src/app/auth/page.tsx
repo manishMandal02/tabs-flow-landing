@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { SignIn, SignUp } from '@/components/auth';
@@ -16,7 +16,7 @@ const Page = () => {
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [profilePic, setProfilePic] = useState('');
+  const [profilePic] = useState('');
 
   const [shouldCreateProfile, setShouldCreateProfile] = useState<boolean | undefined>(undefined);
 
@@ -45,6 +45,7 @@ const Page = () => {
     } else {
       setShouldCreateProfile(false);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleAuthSuccess = () => {
