@@ -6,37 +6,44 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { SignIn, SignUp } from '@/components/auth';
 
-const page = () => {
+const Page = () => {
+  const { push } = useRouter();
+  const query = useSearchParams();
+  const authType = query.get('type');
+  const refQuery = query.get('ref');
+
   const [userId, setUserId] = useState('');
   const [email, setEmail] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [profilePic, setProfilePic] = useState('');
 
-  const [shouldCreateProfile, setShouldCreateProfile] = useState(false);
+  const [shouldCreateProfile, setShouldCreateProfile] = useState<boolean | undefined>(undefined);
 
   const [error, setError] = useState('');
-
-  const { push } = useRouter();
-  const query = useSearchParams();
-  const authType = query.get('type');
 
   useEffect(() => {
     let user = localStorage.getItem('user') as string;
     user = JSON.parse(user);
-    const userId = localStorage.getItem('userId');
+    const userIdStorage = localStorage.getItem('userId');
     const userEmail = localStorage.getItem('userEmail');
 
     if (user) {
       window.postMessage(user, '*');
-      push('/');
+      if (refQuery) {
+        push(`/?ref=${refQuery}`);
+      } else {
+        push('/');
+      }
       return;
     }
 
-    if (!user && userEmail && userId) {
-      setUserId(userId);
+    if (!user && userEmail && userIdStorage) {
+      setUserId(userIdStorage);
       setEmail(userEmail);
       setShouldCreateProfile(true);
+    } else {
+      setShouldCreateProfile(false);
     }
   }, []);
 
@@ -61,7 +68,7 @@ const page = () => {
 
       {/* right: auth form */}
       <div className='w-[40%] h-full flex items-center justify-start flex-col pt-24'>
-        {false ? (
+        {shouldCreateProfile != undefined ? (
           <div className='w-[300px] flex items-center justify-center flex-col'>
             <h1 className='text-lg text-slate-500/80 mb-16'>
               {authType === 'signup' ? 'Start For Free' : 'Welcome back!!'}
@@ -99,4 +106,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
