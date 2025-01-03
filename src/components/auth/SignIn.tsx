@@ -75,7 +75,7 @@ const SignIn = ({
         return [null, new Error(errMsg)];
       }
 
-      let user = resData.user as User;
+      const user = resData.data as User;
 
       return [user, null];
     } catch (err) {
@@ -108,7 +108,7 @@ const SignIn = ({
         return ['', false, new Error(errMsg)];
       }
 
-      return [resData.data.userId, resData.isNewUser, null];
+      return [resData.data.userId, resData.data.isNewUser, null];
     } catch (err) {
       console.log('verify otp err:', err);
       return ['', false, new Error(errMsg)];
@@ -147,9 +147,10 @@ const SignIn = ({
 
     if (user) {
       const userStr = JSON.stringify(user);
+
+      console.log('🚀 ~ file: SignIn.tsx:155 ~ onVerifyOTPNavigate ~ userStr:', userStr);
+
       localStorage.setItem('user', userStr);
-      onAuthSuccess();
-      return;
     }
   };
 
