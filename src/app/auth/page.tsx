@@ -23,13 +23,14 @@ const Page = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    let user = localStorage.getItem('user') as string;
-    user = JSON.parse(user);
+    const userStr = localStorage.getItem('user') as string;
+    const userObj = JSON.parse(userStr);
     const userIdStorage = localStorage.getItem('userId');
     const userEmail = localStorage.getItem('userEmail');
+    const deviceId = localStorage.getItem('deviceId');
 
-    if (user) {
-      window.postMessage(user, '*');
+    if (userObj) {
+      window.postMessage({ ...userObj, deviceId }, '*');
       if (refQuery) {
         push(`/?ref=${refQuery}`);
       } else {
@@ -38,7 +39,7 @@ const Page = () => {
       return;
     }
 
-    if (!user && userEmail && userIdStorage) {
+    if (!userStr && userEmail && userIdStorage) {
       setUserId(userIdStorage);
       setEmail(userEmail);
       setShouldCreateProfile(true);

@@ -103,10 +103,12 @@ const SignIn = ({
 
       const resData = await res.json();
 
-      if (!resData.success || !resData.data.userId) {
+      if (!resData.success || !resData.data.userId || !resData.data.deviceId) {
         console.log('verify otp err:', resData?.message);
         return ['', false, new Error(errMsg)];
       }
+
+      localStorage.setItem('deviceId', resData.data.deviceId);
 
       return [resData.data.userId, resData.data.isNewUser, null];
     } catch (err) {
