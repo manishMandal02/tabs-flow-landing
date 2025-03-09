@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import { SignIn, SignUp } from '@/components/auth';
+import { publishMessage } from '@/utils/post-message';
 
 const Page = () => {
   const { push } = useRouter();
@@ -30,7 +31,7 @@ const Page = () => {
     const deviceId = localStorage.getItem('deviceId');
 
     if (userObj) {
-      window.postMessage({ ...userObj, deviceId }, '*');
+      publishMessage('login', { ...userObj, deviceId });
       if (refQuery) {
         push(`/?ref=${refQuery}`);
       } else {
@@ -50,10 +51,11 @@ const Page = () => {
   }, []);
 
   const handleAuthSuccess = () => {
-    let user = localStorage.getItem('user') as string;
-    user = JSON.parse(user);
+    const userStr = localStorage.getItem('user') as string;
+    const userObj = JSON.parse(userStr);
+    const deviceId = localStorage.getItem('deviceId');
 
-    window.postMessage(user, '*');
+    publishMessage('login', { ...userObj, deviceId });
 
     push('/');
   };

@@ -3,6 +3,7 @@
 import Footer from '@/components/footer';
 import HeaderNav from '@/components/header-nav';
 import { User } from '@/types/user';
+import { publishMessage } from '@/utils/post-message';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -43,8 +44,10 @@ export default function Page() {
       setIsAuthenticated(true);
       if (ref === 'extension') {
         const parsedUser = JSON.parse(user);
+        const deviceId = localStorage.getItem('deviceId');
 
-        window.postMessage(parsedUser, '/');
+        publishMessage('login', { ...parsedUser, deviceId });
+
         const q = new URLSearchParams(searchParams.toString());
         q.delete('ref');
         const newPath = q.size > 0 ? `${pathname}?${q}` : pathname;

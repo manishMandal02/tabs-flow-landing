@@ -131,6 +131,7 @@ const SignIn = ({
 
     if (isNewUser) {
       setShouldCreateProfile(true);
+      onAuthSuccess();
       return;
     }
 
@@ -144,15 +145,15 @@ const SignIn = ({
 
     if (errUserProfile && errUserProfile.message === UserNotFoundErrMsg) {
       setShouldCreateProfile(true);
+      onAuthSuccess();
       return;
     }
 
     if (user) {
       const userStr = JSON.stringify(user);
 
-      console.log('🚀 ~ file: SignIn.tsx:155 ~ onVerifyOTPNavigate ~ userStr:', userStr);
-
       localStorage.setItem('user', userStr);
+      onAuthSuccess();
     }
   };
 
