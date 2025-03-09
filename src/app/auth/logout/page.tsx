@@ -1,3 +1,4 @@
+'use client';
 import { API_BASE_URL } from '@/config';
 import { publishMessage } from '@/utils/post-message';
 import { useEffect, useState } from 'react';
