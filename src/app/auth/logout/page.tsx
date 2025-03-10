@@ -8,7 +8,7 @@ const Logout = () => {
   useEffect(() => {
     (async () => {
       const res = await fetch(`${API_BASE_URL}/auth/logout`, {
-        method: 'POST',
+        method: 'GET',
         credentials: 'include'
       });
 
