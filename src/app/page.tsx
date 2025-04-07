@@ -68,7 +68,9 @@ export default function Page() {
     <>
       {/* seo */}
       <HeaderNav isAuthed={isAuthenticated} />
-      <div className='bg-slate-100/90 h-screen'>Landing Page</div>
+      <div className='bg-slate-50 h-[84%] flex items-center justify-center'>
+        <div className='text-slate-700 text-xl font-light'>Coming Soon..</div>
+      </div>
       <Footer />
     </>
   );
